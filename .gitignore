@@ -48,9 +48,6 @@ bin/
 # Ignore files related to GitHub Codespaces
 .devcontainer/
 
-# Go module files
-go.sum
-
 # Dependency directories (remove the comment below if you use vendoring)
 vendor/
 
