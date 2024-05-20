@@ -27,10 +27,6 @@ WORKDIR /root/
 
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/main .
-COPY --from=builder /app/.env .
-
-# Expose port (documentation purpose)
-EXPOSE 8080
 
 # Command to run the executable
 CMD ["./main"]
