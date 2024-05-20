@@ -33,7 +33,7 @@ func InitRouter() {
 	}
 
 	port := os.Getenv("SERVER_PORT")
-	routerError := router.Run("localhost:" + port)
+	routerError := router.Run(":" + port)
 	if routerError != nil {
 		zap.L().Error(fmt.Sprintf("GinRouter initialization failed: %v", routerError))
 	}
