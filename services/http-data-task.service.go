@@ -65,11 +65,6 @@ func HttpDataTask(task model.CronTask) {
 			return
 		}
 
-		print(currentResult)
-
-		//si pas de previous pas de traitement
-		// TODO : Treatment
-		// Get treatment function
 		treatmentFunc := TreatmentFactory(*task.Differential)
 		if treatmentFunc == nil {
 			//log
