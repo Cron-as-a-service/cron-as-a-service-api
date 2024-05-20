@@ -31,9 +31,6 @@ jobs:
         with:
           go-version: "1.18"
 
-      - name: install semantic exec
-        run: go get github.com/semantic-release/exec -D
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
