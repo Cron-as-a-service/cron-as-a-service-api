@@ -7,6 +7,10 @@ WORKDIR /app
 # Copy go mod and go sum files
 COPY go.mod ./
 
+# Fetch dependencies.
+# Using go get.
+RUN go get -d -v
+
 # Generate go.sum
 RUN go mod tidy
 
@@ -14,7 +18,7 @@ RUN go mod tidy
 RUN go mod download
 
 # Copy the source from the current directory to the Working Directory inside the container
-COPY . .
+COPY . ./
 
 # Build the Go app
 RUN go build -o main .
