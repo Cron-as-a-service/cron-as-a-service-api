@@ -1,0 +1,11 @@
+# Ignore the .git directory
+.git
+# Ignore the node_modules directory (if applicable)
+node_modules
+# Ignore the .env file
+.env
+# Ignore the Dockerfile and .dockerignore file
+Dockerfile
+.dockerignore
+# Ignore test files and directories
+**/*_test.go
