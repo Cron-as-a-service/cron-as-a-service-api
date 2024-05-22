@@ -8,6 +8,7 @@ import (
 	"frderoubaix.me/cron-as-a-service/model"
 	"frderoubaix.me/cron-as-a-service/repositories"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 	"io"
@@ -38,7 +39,7 @@ func HttpDataTask(task model.CronTask) {
 				return
 			}
 			if *task.Differential == "new" {
-				err = repositories.StoreTreatmentResult(task.Id, _bsonMToSlice(lastResult))
+				err = repositories.StoreTreatmentResult(task.Id, transformResult(lastResult["result"]))
 				if err != nil {
 					zap.L().Info(
 						fmt.Sprintf(
@@ -171,10 +172,14 @@ func addDataInDB(task model.CronTask, result *http.Response) error {
 	return nil
 }
 
-func _bsonMToSlice(bsonMap bson.M) []interface{} {
-	var result []interface{}
-	for key, value := range bsonMap {
-		result = append(result, map[string]interface{}{"Key": key, "Value": value})
+func transformResult(result interface{}) []interface{} {
+	var transformed []interface{}
+	if resultArray, ok := result.(primitive.A); ok {
+		for _, item := range resultArray {
+			if itemMap, ok := item.(primitive.M); ok {
+				transformed = append(transformed, itemMap)
+			}
+		}
 	}
-	return result
+	return transformed
 }
