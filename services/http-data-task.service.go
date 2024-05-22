@@ -37,6 +37,17 @@ func HttpDataTask(task model.CronTask) {
 				))
 				return
 			}
+			if *task.Differential == "new" {
+				err = repositories.StoreTreatmentResult(task.Id, _bsonMToSlice(lastResult))
+				if err != nil {
+					zap.L().Info(
+						fmt.Sprintf(
+							"Task id : %s Impossible to store treatment in database", task.Id,
+						),
+					)
+					return
+				}
+			}
 			TaskLogger(task, "OK", fmt.Sprintf(
 				"Task id : %s with Method %s success with code : %d for the first time", task.Id, task.HttpMethod, result.StatusCode,
 			))
@@ -47,8 +58,6 @@ func HttpDataTask(task model.CronTask) {
 			)
 			return
 		}
-
-		print(lastResult)
 
 		// Insert plat in DB (replace previous call by current call)
 		err = addDataInDB(task, result)
@@ -62,17 +71,6 @@ func HttpDataTask(task model.CronTask) {
 		currentResult, err := getLastTaskResult(task)
 		if err != nil {
 			//log
-			if *task.Differential == "new" {
-				err = repositories.StoreTreatmentResult(task.Id, _bsonMToSlice(currentResult))
-				if err != nil {
-					zap.L().Info(
-						fmt.Sprintf(
-							"Task id : %s Impossible to store treatment in database", task.Id,
-						),
-					)
-					return
-				}
-			}
 			return
 		}
 
@@ -97,9 +95,12 @@ func HttpDataTask(task model.CronTask) {
 			return
 		}
 
+		TaskLogger(task, "OK", fmt.Sprintf(
+			"Task id : %s differential success with code : %d", task.Id, result.StatusCode,
+		))
 		zap.L().Info(
 			fmt.Sprintf(
-				"Task id : %s with Method %s success with code : %d", task.Id, task.HttpMethod, result.StatusCode,
+				"Task id : %s differential success with code : %d", task.Id, result.StatusCode,
 			),
 		)
 	}
