@@ -23,6 +23,10 @@ func CreateTask(task model.CronTask) (*mongo.InsertOneResult, error) {
 	return result, err
 }
 
+func RunTask(task model.CronTask) {
+	ServiceFactory(task)
+}
+
 func GetAllTasks() ([]model.CronTask, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

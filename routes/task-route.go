@@ -120,4 +120,15 @@ func TaskRoute(router *gin.Engine) {
 		}
 		context.JSON(http.StatusOK, treatments)
 	})
+
+	router.GET("/api/v1/task/:taskId/run", func(context *gin.Context) {
+		taskId := context.Param("taskId")
+		task, err := services.GetTaskById(taskId)
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		services.RunTask(*task)
+		context.Status(http.StatusOK)
+	})
 }

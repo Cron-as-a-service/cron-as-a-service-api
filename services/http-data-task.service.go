@@ -62,6 +62,17 @@ func HttpDataTask(task model.CronTask) {
 		currentResult, err := getLastTaskResult(task)
 		if err != nil {
 			//log
+			if *task.Differential == "new" {
+				err = repositories.StoreTreatmentResult(task.Id, _bsonMToSlice(currentResult))
+				if err != nil {
+					zap.L().Info(
+						fmt.Sprintf(
+							"Task id : %s Impossible to store treatment in database", task.Id,
+						),
+					)
+					return
+				}
+			}
 			return
 		}
 
@@ -102,6 +113,9 @@ func httpCall(task model.CronTask) (*http.Response, error) {
 				"Task id : %s with Method %s failed with code : %d and error : %s", task.Id, task.HttpMethod, result.StatusCode, err.Error(),
 			),
 		)
+		TaskLogger(task, "ERROR", fmt.Sprintf(
+			"Task id : %s API might be unreachable", task.Id,
+		))
 		return nil, err
 	}
 
@@ -116,6 +130,9 @@ func getLastTaskResult(task model.CronTask) (bson.M, error) {
 	var result bson.M
 	err := database.TasksResult.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
+		TaskLogger(task, "ERROR", fmt.Sprintf(
+			"Task id : %s Impossible to get previous task", task.Id,
+		))
 		return result, err
 	}
 	return result, nil
@@ -144,8 +161,19 @@ func addDataInDB(task model.CronTask, result *http.Response) error {
 
 	_, err = database.TasksResult.UpdateOne(context.Background(), filter, update, opts)
 	if err != nil {
+		TaskLogger(task, "ERROR", fmt.Sprintf(
+			"Task id : %s Problem appear when update Task result", task.Id,
+		))
 		return err
 	}
 
 	return nil
+}
+
+func _bsonMToSlice(bsonMap bson.M) []interface{} {
+	var result []interface{}
+	for key, value := range bsonMap {
+		result = append(result, map[string]interface{}{"Key": key, "Value": value})
+	}
+	return result
 }
