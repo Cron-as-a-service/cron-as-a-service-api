@@ -38,6 +38,7 @@ func HttpDataTask(task model.CronTask) {
 				))
 				return
 			}
+			lastResult, err := getLastTaskResult(task)
 			if *task.Differential == "new" {
 				err = repositories.StoreTreatmentResult(task.Id, transformResult(lastResult["result"]))
 				if err != nil {
